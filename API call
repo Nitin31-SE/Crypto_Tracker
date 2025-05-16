@@ -1,0 +1,23 @@
+import requests
+import pandas as pd
+from dataiku import Dataset
+
+url = "https://api.coingecko.com/api/v3/coins/markets"
+params = {
+    'vs_currency': 'usd',
+    'order': 'market_cap_desc',
+    'per_page': 10,
+    'page': 1,
+    'sparkline': 'false'
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+df = pd.DataFrame(data)
+
+df = df[['id', 'symbol', 'name', 'current_price', 'market_cap',
+         'price_change_percentage_24h', 'total_volume', 'last_updated']]
+
+output_dataset = Dataset("crypto_prices")
+output_dataset.write_with_schema(df)
